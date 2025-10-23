@@ -1,13 +1,10 @@
 # 🧠 Continual Learning with Experience Replay
-
 A comprehensive implementation of Experience Replay techniques for Continual Learning scenarios, designed to mitigate catastrophic forgetting in deep neural networks.
 
 ## 📋 Overview
-
 This repository provides a modular framework for implementing and evaluating Experience Replay methods in continual learning settings. Experience Replay is a powerful technique that stores and replays past experiences to maintain previously learned knowledge while learning new tasks.
 
 ## ✨ Features
-
 - 🔄 **Multiple Replay Strategies**: Implementation of various experience replay methods including:
   - Reservoir Sampling
   - Gradient-based Selection
@@ -22,13 +19,11 @@ This repository provides a modular framework for implementing and evaluating Exp
 ## 🚀 Installation
 
 ### Prerequisites
-
 - Python 3.8 or higher
 - PyTorch 1.10 or higher
 - CUDA-compatible GPU (recommended)
 
 ### Setup
-
 1. Clone the repository:
 ```bash
 git clone https://github.com/Nakshatra1729yuvi/CL-Experience_Replay.git
@@ -47,7 +42,6 @@ pip install -r requirements.txt
 ```
 
 ## 📦 Requirements
-
 ```
 torch>=1.10.0
 torchvision>=0.11.0
@@ -58,81 +52,87 @@ tqdm>=4.62.0
 tensorboard>=2.7.0
 ```
 
-## 💻 Usage
+## 🎓 Usage
 
 ### Basic Example
-
 ```python
-from models import ExperienceReplayModel
-from datasets import get_continual_dataset
-from replay import ReservoirSampling
+from cl_experience_replay import ExperienceReplayModel, DatasetSequence
 
 # Initialize model and replay buffer
-model = ExperienceReplayModel(input_size=784, hidden_size=256, num_classes=10)
-replay_buffer = ReservoirSampling(memory_size=500)
-
-# Load continual learning dataset
-train_tasks, test_tasks = get_continual_dataset('MNIST', num_tasks=5)
+model = ExperienceReplayModel(
+    model_name='resnet18',
+    buffer_size=1000,
+    replay_strategy='reservoir'
+)
 
 # Train on sequential tasks
-for task_id, (train_data, test_data) in enumerate(zip(train_tasks, test_tasks)):
-    print(f"Training on Task {task_id + 1}")
-    model.train_task(train_data, replay_buffer)
-    
-    # Evaluate on all previous tasks
-    avg_accuracy = model.evaluate_all_tasks(test_tasks[:task_id+1])
-    print(f"Average Accuracy: {avg_accuracy:.2f}%")
+for task_id, task_data in enumerate(task_sequence):
+    model.train_task(task_data, task_id)
+    model.evaluate()
 ```
 
-### Training with Custom Configuration
-
+### Advanced Configuration
 ```python
-python train.py --dataset CIFAR100 \
-                --num_tasks 10 \
-                --memory_size 2000 \
-                --replay_strategy reservoir \
-                --epochs 50 \
-                --batch_size 32 \
-                --learning_rate 0.001
+config = {
+    'model': 'resnet18',
+    'buffer_size': 2000,
+    'replay_strategy': 'gradient_based',
+    'learning_rate': 0.001,
+    'batch_size': 32,
+    'epochs_per_task': 10
+}
+
+model = ExperienceReplayModel(**config)
 ```
 
-### Evaluation
+## 🔬 Experiments
 
-```python
-python evaluate.py --checkpoint checkpoints/model_best.pth \
-                   --dataset CIFAR100 \
-                   --num_tasks 10
+We provide several pre-configured experiments:
+
+### Split MNIST
+```bash
+python experiments/run_split_mnist.py --buffer_size 500 --strategy reservoir
 ```
 
-## 📊 Supported Datasets
+### Permuted MNIST
+```bash
+python experiments/run_permuted_mnist.py --n_tasks 10 --buffer_size 1000
+```
 
-- MNIST
-- Fashion-MNIST
-- CIFAR-10
-- CIFAR-100
-- TinyImageNet
-- Custom datasets (with provided data loaders)
+### Split CIFAR-10
+```bash
+python experiments/run_split_cifar10.py --buffer_size 2000 --strategy herding
+```
 
-## 🔬 Experimental Results
+## 📊 Evaluation Metrics
 
-The repository includes scripts to reproduce key results from continual learning literature:
+The framework tracks several key metrics:
+- **Average Accuracy**: Performance across all learned tasks
+- **Forgetting Measure**: Quantifies catastrophic forgetting
+- **Forward Transfer**: Measures positive transfer to new tasks
+- **Backward Transfer**: Measures knowledge retention
 
-- **Catastrophic Forgetting Analysis**: Measure forgetting across tasks
-- **Memory Efficiency**: Compare replay strategies with different buffer sizes
-- **Scalability**: Evaluate performance with varying number of tasks
+## 🏗️ Architecture
+
+```
+CL-Experience_Replay/
+├── cl_experience_replay/
+│   ├── models/          # Neural network architectures
+│   ├── buffers/         # Experience replay buffer implementations
+│   ├── strategies/      # Sample selection strategies
+│   ├── datasets/        # Dataset loaders and processors
+│   └── utils/           # Utility functions
+├── experiments/         # Experiment scripts
+├── notebooks/           # Jupyter notebooks for analysis
+├── tests/              # Unit tests
+└── configs/            # Configuration files
+```
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these guidelines:
-
-1. **Fork the repository** and create your branch from `main`
-2. **Write clear commit messages** describing your changes
-3. **Add tests** for new functionality
-4. **Update documentation** as needed
-5. **Submit a pull request** with a comprehensive description
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
 ### Development Setup
-
 ```bash
 # Install development dependencies
 pip install -r requirements-dev.txt
@@ -145,14 +145,17 @@ flake8 .
 black .
 ```
 
-## 📄 License
+## Results 📊
 
+**Final Validation Accuracies:**
+- FashionMNIST: **87.68%**
+- MNIST: **93.82%**
+
+## 📄 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgements
-
 This work builds upon research in continual learning and experience replay:
-
 - **Experience Replay**: Inspired by the seminal work in reinforcement learning and its adaptation to supervised continual learning
 - **Continual Learning Benchmarks**: Thanks to the continual learning community for establishing evaluation protocols
 - **PyTorch Community**: For providing an excellent deep learning framework
@@ -163,9 +166,7 @@ Special thanks to researchers whose work has influenced this implementation:
 - Riemer et al. (2019) - "Learning to Learn without Forgetting"
 
 ## 📚 Citation
-
 If you use this code in your research, please cite:
-
 ```bibtex
 @software{cl_experience_replay,
   author = {Nakshatra1729yuvi},
@@ -176,15 +177,12 @@ If you use this code in your research, please cite:
 ```
 
 ## 📧 Contact
-
 For questions, issues, or suggestions, please:
 - Open an issue on GitHub
 - Start a discussion in the Discussions tab
 
 ## 🌟 Star History
-
 If you find this project helpful, please consider giving it a star! ⭐
 
 ---
-
 **Happy Continual Learning!** 🚀🧠
