@@ -5,11 +5,7 @@ A comprehensive implementation of Experience Replay techniques for Continual Lea
 This repository provides a modular framework for implementing and evaluating Experience Replay methods in continual learning settings. Experience Replay is a powerful technique that stores and replays past experiences to maintain previously learned knowledge while learning new tasks.
 
 ## ✨ Features
-- 🔄 **Multiple Replay Strategies**: Implementation of various experience replay methods including:
-  - Reservoir Sampling
-  - Gradient-based Selection
-  - Herding Selection
-  - Random Selection
+- 🔄 **Multiple Replay Strategies**: Implementation of experience replay
 - 📊 **Comprehensive Evaluation**: Built-in metrics for measuring catastrophic forgetting and knowledge retention
 - 🎯 **Task-Incremental Learning**: Support for both class-incremental and task-incremental scenarios
 - 🔧 **Modular Architecture**: Easy to extend and customize for different models and datasets
